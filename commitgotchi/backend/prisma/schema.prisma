@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String          @id @default(cuid())
+  githubId         String          @unique
+  email            String?         @unique
+  username         String          @unique
+  avatarUrl        String?
+  totalXP          Int             @default(0)
+  level            Int             @default(1)
+  commitCoins      Int             @default(0)
+  currentStreak    Int             @default(0)
+  lastCommitDate   DateTime?
+  xpBlockedUntil   DateTime?
+  guildId          String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  guild            Guild?          @relation(fields: [guildId], references: [id])
+  gotchi           Gotchi?
+  activityLogs     ActivityLog[]
+  userInventory    UserInventory[]
+
+  @@map("users")
+}
+
+model Gotchi {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  name      String   @default("Gotchi")
+  theme     String   @default("JS") // JS | Python | Rust | Go | TypeScript
+  mood      Int      @default(75)   // 0-100
+  energy    Int      @default(100)  // 0-100
+  outfitId  String?
+  level     Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  outfit    InventoryItem? @relation(fields: [outfitId], references: [id])
+
+  @@map("gotchis")
+}
+
+model Guild {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  description  String?
+  totalXP      Int      @default(0)
+  mascotLevel  Int      @default(1)
+  iconUrl      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  members      User[]
+
+  @@map("guilds")
+}
+
+model InventoryItem {
+  id        String          @id @default(cuid())
+  name      String
+  type      String
+  price     Int
+  assetUrl  String
+  rarity    String          @default("COMMON")
+  createdAt DateTime        @default(now())
+
+  ownedBy   UserInventory[]
+  equippedBy Gotchi[]
+
+  @@map("inventory_items")
+}
+
+model UserInventory {
+  id        String        @id @default(cuid())
+  userId    String
+  itemId    String
+  acquiredAt DateTime     @default(now())
+
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item      InventoryItem @relation(fields: [itemId], references: [id])
+
+  @@unique([userId, itemId])
+  @@map("user_inventory")
+}
+
+model ActivityLog {
+  id         String       @id @default(cuid())
+  userId     String
+  actionType String
+  xpGained   Int          @default(0)
+  coinsGained Int         @default(0)
+  metadata   String?        // SQLite doesn't support Json natively as easily as Postgres, so we'll use a String and JSON.parse/stringify if needed, or Prisma will handle it as a stringified JSON if we keep Json type (but SQLite provider in Prisma does support Json via string storage)
+  createdAt  DateTime     @default(now())
+
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("activity_logs")
+}
+
+// Enums removed for SQLite compatibility. Use string literals in code.

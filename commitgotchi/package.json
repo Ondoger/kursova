@@ -1,0 +1,19 @@
+{
+  "name": "commitgotchi",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CommitGotchi monorepo — gamified developer productivity SaaS",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "dev:backend": "npm run start:dev --workspace=backend",
+    "build:frontend": "npm run build --workspace=frontend",
+    "build:backend": "npm run build --workspace=backend",
+    "install:all": "npm install --workspace=frontend && npm install --workspace=backend",
+    "prisma:generate": "npm run prisma:generate --workspace=backend",
+    "prisma:migrate": "npm run prisma:migrate --workspace=backend"
+  }
+}

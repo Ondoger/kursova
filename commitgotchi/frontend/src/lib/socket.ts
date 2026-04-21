@@ -1,0 +1,24 @@
+import { io, Socket } from 'socket.io-client';
+
+let socket: Socket | null = null;
+
+export function getSocket(): Socket {
+  if (!socket) {
+    socket = io(process.env.NEXT_PUBLIC_WS_URL ?? 'http://localhost:3001', {
+      withCredentials: true,  // sends httpOnly cookie
+      autoConnect: false,
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
+  }
+  return socket;
+}
+
+export function disconnectSocket(): void {
+  if (socket?.connected) {
+    socket.disconnect();
+  }
+  socket = null;
+}
