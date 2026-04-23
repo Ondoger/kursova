@@ -14,9 +14,6 @@ import { AiFeedbackToast } from '@/components/AiFeedbackToast';
 import { InventoryModal, LeaderboardModal, GuildsModal, CharactersModal } from '@/components/Modals/DashboardModals';
 import type { UserData, GotchiData } from '@/types';
 
-// NOTE: metadata must be in a server component — this page is client-only
-// so metadata is defined in a separate file (layout or metadata.ts)
-
 interface ProfileResponse {
   user: UserData;
   gotchi: GotchiData;
@@ -37,16 +34,13 @@ export default function DashboardPage(): JSX.Element {
     setMorningMessage,
   } = useGotchiStore();
 
-  // ── Modal state ──
   const [showInventory, setShowInventory] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showGuilds, setShowGuilds] = useState(false);
   const [showCharactersModal, setShowCharactersModal] = useState(false);
 
-  // Connect Socket.io
   const { isConnected } = useSocket(!!user);
 
-  // Load user & gotchi data on mount
   useEffect(() => {
     const loadProfile = async (): Promise<void> => {
       try {
@@ -58,17 +52,14 @@ export default function DashboardPage(): JSX.Element {
         setUser(userRes);
         setGotchi(gotchiRes);
 
-        // Check for morning message in URL params (set by backend on first daily login)
         const params = new URLSearchParams(window.location.search);
         if (params.get('morning') === '1') {
-          // The morning message is received via socket after connection
           params.delete('morning');
           const newUrl = `${window.location.pathname}`;
           window.history.replaceState({}, '', newUrl);
         }
       } catch (err) {
         console.error('Failed to load profile:', err);
-        // Redirect to login if unauthorized
         window.location.href = '/';
       } finally {
         setLoading(false);
@@ -82,97 +73,58 @@ export default function DashboardPage(): JSX.Element {
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
-        {/* Animated background */}
+        {/* Enso circle */}
         <motion.div
-          className="absolute inset-0 opacity-30"
-          animate={{
-            background: [
-              'radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.3) 0%, transparent 50%)',
-              'radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.3) 0%, transparent 50%)',
-              'radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.3) 0%, transparent 50%)',
-              'radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.3) 0%, transparent 50%)',
-            ],
-          }}
-          transition={{ duration: 5, repeat: Infinity }}
-        />
-
-        {/* Floating particles */}
-        {Array.from({ length: 20 }).map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 rounded-full bg-purple-500"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -100, 0],
-              opacity: [0, 1, 0],
-              scale: [0, 1.5, 0],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
-
-        <motion.div
-          className="text-8xl mb-6 relative z-10"
-          animate={{
-            y: [0, -12, 0],
-            rotate: [0, -5, 5, 0],
-            scale: [1, 1.1, 1],
-          }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+          className="relative z-10 mb-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
         >
-          🐱
+          <svg width="80" height="80" viewBox="0 0 80 80" className="animate-breathe">
+            <circle
+              cx="40"
+              cy="40"
+              r="34"
+              fill="none"
+              stroke="#b4a7d6"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeDasharray="180 40"
+              opacity="0.7"
+            />
+          </svg>
         </motion.div>
 
         <motion.div
-          className="font-display text-2xl font-bold text-gradient-cyan mb-2 relative z-10"
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity }}
+          className="font-display text-xl font-semibold text-gradient-ink mb-2 relative z-10"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
         >
           CommitGotchi
         </motion.div>
 
         <motion.div
-          className="text-slate-500 text-sm relative z-10"
+          className="text-sumi-500 text-sm relative z-10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          Loading your companion...
+          Preparing your space...
         </motion.div>
 
-        <div className="flex gap-1.5 mt-6 relative z-10">
-          {[0, 0.2, 0.4].map((d) => (
-            <motion.div
-              key={d}
-              className="w-3 h-3 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500"
-              animate={{
-                opacity: [0.3, 1, 0.3],
-                scale: [0.8, 1.5, 0.8],
-                y: [0, -10, 0],
-              }}
-              transition={{ duration: 0.8, delay: d, repeat: Infinity }}
-            />
-          ))}
-        </div>
-
-        {/* Loading bar */}
+        {/* Single progress line */}
         <motion.div
-          className="w-64 h-1 bg-white/10 rounded-full overflow-hidden mt-8 relative z-10"
+          className="w-48 h-0.5 bg-sumi-800 rounded-full overflow-hidden mt-6 relative z-10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
           <motion.div
-            className="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500"
+            className="h-full rounded-full"
+            style={{ background: 'linear-gradient(90deg, #b4a7d6, #68a4c4)' }}
             animate={{ x: ['-100%', '100%'] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: 'linear' }}
           />
         </motion.div>
       </div>
@@ -184,114 +136,73 @@ export default function DashboardPage(): JSX.Element {
 
   return (
     <>
-      {/* Overlays */}
       <LevelUpOverlay />
       <AiFeedbackToast />
 
-      {/* ── Modals ── */}
       <InventoryModal isOpen={showInventory} onClose={() => setShowInventory(false)} />
       <LeaderboardModal isOpen={showLeaderboard} onClose={() => setShowLeaderboard(false)} />
       <GuildsModal isOpen={showGuilds} onClose={() => setShowGuilds(false)} />
       <CharactersModal isOpen={showCharactersModal} onClose={() => setShowCharactersModal(false)} />
 
       <div className="min-h-screen flex flex-col">
-        {/* Animated background orbs */}
+        {/* Ambient background — single warm orb */}
         <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
-          <motion.div
-            className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-purple-600/10 blur-[120px]"
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.1, 0.15, 0.1],
-            }}
-            transition={{ duration: 8, repeat: Infinity }}
-          />
-          <motion.div
-            className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] rounded-full bg-cyan-500/10 blur-[100px]"
-            animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.1, 0.15, 0.1],
-            }}
-            transition={{ duration: 6, repeat: Infinity, delay: 1 }}
-          />
-          <motion.div
-            className="absolute top-[40%] left-[50%] w-[300px] h-[300px] rounded-full bg-pink-500/8 blur-[80px]"
-            animate={{
-              scale: [1, 1.4, 1],
-              opacity: [0.08, 0.12, 0.08],
-              x: [-50, 50, -50],
-            }}
-            transition={{ duration: 10, repeat: Infinity, delay: 2 }}
+          <div
+            className="absolute top-[-15%] left-[-5%] w-[500px] h-[500px] rounded-full blur-[140px] animate-breathe"
+            style={{ backgroundColor: 'rgba(212, 168, 67, 0.04)' }}
           />
         </div>
 
         {/* ============ TOP BAR ============ */}
         <motion.header
           className="relative z-10 px-6 py-3"
-          initial={{ y: -50, opacity: 0 }}
+          initial={{ y: -30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
         >
           <div className="max-w-screen-2xl mx-auto flex items-center gap-4">
             {/* Logo */}
-            <motion.div
-              className="flex items-center gap-2 flex-shrink-0"
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: 'spring', stiffness: 400 }}
-            >
-              <motion.span
-                className="text-2xl"
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                🐱
-              </motion.span>
-              <span className="font-display font-bold text-sm text-gradient-cyan hidden sm:block">
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <span className="font-display font-semibold text-sm text-gradient-ink hidden sm:block">
                 CommitGotchi
               </span>
-            </motion.div>
+            </div>
 
-            {/* XP Bar — takes most space */}
+            {/* XP Bar */}
             <div className="flex-1">
               <XPBar />
             </div>
 
             {/* Connection indicator */}
-            <motion.div
-              className={`flex items-center gap-1.5 text-xs rounded-full px-3 py-1.5 border flex-shrink-0 ${
+            <div
+              className={`flex items-center gap-1.5 text-xs rounded-md px-3 py-1.5 border flex-shrink-0 ${
                 isConnected
-                  ? 'text-green-400 border-green-500/30 bg-green-500/10'
-                  : 'text-red-400 border-red-500/30 bg-red-500/10'
+                  ? 'text-wakatake border-wakatake/20 bg-wakatake/5'
+                  : 'text-shu border-shu/20 bg-shu/5'
               }`}
-              whileHover={{ scale: 1.05 }}
-              animate={isConnected ? { boxShadow: ['0 0 0 rgba(34, 197, 94, 0)', '0 0 20px rgba(34, 197, 94, 0.3)', '0 0 0 rgba(34, 197, 94, 0)'] } : {}}
-              transition={{ duration: 2, repeat: Infinity }}
             >
-              <motion.div
+              <div
                 className={`w-1.5 h-1.5 rounded-full ${
-                  isConnected ? 'bg-green-400' : 'bg-red-400'
+                  isConnected ? 'bg-wakatake' : 'bg-shu'
                 }`}
-                animate={isConnected ? { scale: [1, 1.3, 1], opacity: [1, 0.5, 1] } : {}}
-                transition={{ duration: 1.5, repeat: Infinity }}
               />
               <span className="hidden sm:block">
                 {isConnected ? 'Live' : 'Offline'}
               </span>
-            </motion.div>
+            </div>
 
             {/* Logout */}
-            <motion.button
+            <button
               id="logout-btn"
               onClick={async () => {
                 await apiFetch('/auth/logout', { method: 'POST' });
                 window.location.href = '/';
               }}
-              className="text-slate-500 hover:text-slate-300 text-sm transition-colors flex-shrink-0"
+              className="text-sumi-500 hover:text-sumi-300 text-sm transition-colors flex-shrink-0"
               aria-label="Logout"
-              whileHover={{ scale: 1.05, x: -3 }}
-              whileTap={{ scale: 0.95 }}
             >
-              ← Exit
-            </motion.button>
+              Exit
+            </button>
           </div>
         </motion.header>
 
@@ -311,24 +222,16 @@ export default function DashboardPage(): JSX.Element {
           >
             {/* ============ CENTER: Gotchi Room ============ */}
             <motion.div
-              className="rounded-2xl overflow-hidden relative"
+              className="rounded-lg overflow-hidden relative"
               style={{ gridArea: 'center', minHeight: '460px' }}
-              initial={{ opacity: 0, scale: 0.9, rotateX: 10 }}
-              animate={{ opacity: 1, scale: 1, rotateX: 0 }}
-              transition={{ duration: 0.8, type: 'spring' }}
-              whileHover={{ scale: 1.01 }}
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
             >
-              {/* Glow effect */}
-              <motion.div
-                className="absolute inset-0 rounded-2xl"
-                animate={{
-                  boxShadow: [
-                    '0 0 30px rgba(99, 102, 241, 0.3)',
-                    '0 0 50px rgba(139, 92, 246, 0.4)',
-                    '0 0 30px rgba(99, 102, 241, 0.3)',
-                  ],
-                }}
-                transition={{ duration: 3, repeat: Infinity }}
+              {/* Static subtle shadow instead of neon pulse */}
+              <div
+                className="absolute inset-0 rounded-lg pointer-events-none"
+                style={{ boxShadow: '0 4px 24px rgba(22, 22, 26, 0.3)' }}
               />
               <GotchiRoom
                 animationState={animationState}
@@ -346,16 +249,13 @@ export default function DashboardPage(): JSX.Element {
             <motion.div
               className="flex flex-col gap-4"
               style={{ gridArea: 'sidebar' }}
-              initial={{ opacity: 0, x: 50 }}
+              initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: 0.1 }}
             >
-              {/* Guild chat — takes all remaining space */}
               <motion.div
                 className="flex-1 min-h-0"
                 style={{ minHeight: '300px' }}
-                whileHover={{ scale: 1.01 }}
-                transition={{ type: 'spring', stiffness: 300 }}
               >
                 {user?.guildId ? (
                   <GuildChat
@@ -363,34 +263,23 @@ export default function DashboardPage(): JSX.Element {
                     guildName="My Guild"
                   />
                 ) : (
-                  <div className="glass-card h-full flex flex-col items-center justify-center gap-3 text-center p-6 relative overflow-hidden">
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10"
-                      animate={{ opacity: [0.1, 0.2, 0.1] }}
-                      transition={{ duration: 3, repeat: Infinity }}
-                    />
-                    <motion.span
-                      className="text-3xl relative z-10"
-                      animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      ⚔️
-                    </motion.span>
-                    <div className="text-sm font-semibold text-white relative z-10">
+                  <div className="washi-card h-full flex flex-col items-center justify-center gap-3 text-center p-6">
+                    <span className="text-2xl text-fuji/40 font-serif select-none">
+                      結
+                    </span>
+                    <div className="text-sm font-medium text-sumi-100">
                       No Guild Yet
                     </div>
-                    <p className="text-xs text-slate-500 leading-relaxed relative z-10">
+                    <p className="text-xs text-sumi-500 leading-relaxed">
                       Join a guild to unlock real-time chat and compete on the leaderboard.
                     </p>
-                    <motion.button
+                    <button
                       id="find-guild-sidebar-btn"
-                      className="btn-purple text-xs relative z-10"
+                      className="btn-shu text-xs"
                       onClick={() => setShowGuilds(true)}
-                      whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(139, 92, 246, 0.5)' }}
-                      whileTap={{ scale: 0.95 }}
                     >
                       Find a Guild
-                    </motion.button>
+                    </button>
                   </div>
                 )}
               </motion.div>
@@ -400,230 +289,138 @@ export default function DashboardPage(): JSX.Element {
             <motion.div
               className="grid grid-cols-3 gap-4"
               style={{ gridArea: 'controls' }}
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: 0.2 }}
             >
               {/* Pomodoro Timer */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.4 }}
-                whileHover={{ scale: 1.02, y: -2 }}
-              >
+              <div>
                 <PomodoroTimer />
-              </motion.div>
+              </div>
 
               {/* GitHub Stats panel */}
-              <motion.div
-                className="glass-card p-5 relative overflow-hidden"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5 }}
-                whileHover={{ scale: 1.02, y: -2 }}
-              >
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5"
-                  animate={{ opacity: [0.05, 0.1, 0.05] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                />
-
-                <div className="flex items-center gap-2 mb-4 relative z-10">
-                  <motion.span
-                    className="text-xl"
-                    animate={{ rotate: [0, 360] }}
-                    transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                  >
-                    📊
-                  </motion.span>
-                  <span className="font-display font-semibold text-sm text-white">
-                    GitHub Stats
+              <div className="washi-card p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="font-display font-medium text-sm text-sumi-100">
+                    Stats
                   </span>
                 </div>
 
-                <div className="space-y-3 relative z-10">
-                  <motion.div
-                    className="flex items-center justify-between"
-                    whileHover={{ x: 5 }}
-                    transition={{ type: 'spring', stiffness: 300 }}
-                  >
-                    <span className="text-xs text-slate-500">Total Commits</span>
-                    <motion.span
-                      className="text-xs font-mono text-cyan-400"
-                      animate={{ scale: [1, 1.05, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-sumi-500">Total Commits</span>
+                    <span className="text-xs font-mono text-fuji">
                       {user ? Math.floor(user.totalXP / 10) : 0}
-                    </motion.span>
-                  </motion.div>
-
-                  <motion.div
-                    className="flex items-center justify-between"
-                    whileHover={{ x: 5 }}
-                    transition={{ type: 'spring', stiffness: 300 }}
-                  >
-                    <span className="text-xs text-slate-500">Streak</span>
-                    <span className="text-xs font-mono text-orange-400">
-                      🔥 {user?.currentStreak ?? 0} days
                     </span>
-                  </motion.div>
+                  </div>
 
-                  <motion.div
-                    className="flex items-center justify-between"
-                    whileHover={{ x: 5 }}
-                    transition={{ type: 'spring', stiffness: 300 }}
-                  >
-                    <span className="text-xs text-slate-500">Gotchi Mood</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-sumi-500">Streak</span>
+                    <span className="text-xs font-mono text-yamabuki">
+                      {user?.currentStreak ?? 0} days
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-sumi-500">Mood</span>
                     <div className="flex items-center gap-1.5">
-                      <div className="w-16 bg-white/5 rounded-full h-1.5 overflow-hidden">
+                      <div className="w-16 bg-sumi-800 rounded-full h-1.5 overflow-hidden">
                         <motion.div
-                          className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-400"
+                          className="h-full rounded-full bg-fuji"
                           initial={{ width: 0 }}
                           animate={{ width: `${gotchi?.mood ?? 0}%` }}
                           transition={{ duration: 1, delay: 0.6 }}
                         />
                       </div>
-                      <span className="text-xs font-mono text-purple-400">
+                      <span className="text-xs font-mono text-fuji">
                         {gotchi?.mood ?? 0}
                       </span>
                     </div>
-                  </motion.div>
+                  </div>
 
-                  <motion.div
-                    className="flex items-center justify-between"
-                    whileHover={{ x: 5 }}
-                    transition={{ type: 'spring', stiffness: 300 }}
-                  >
-                    <span className="text-xs text-slate-500">Energy</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-sumi-500">Energy</span>
                     <div className="flex items-center gap-1.5">
-                      <div className="w-16 bg-white/5 rounded-full h-1.5 overflow-hidden">
+                      <div className="w-16 bg-sumi-800 rounded-full h-1.5 overflow-hidden">
                         <motion.div
-                          className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-400"
+                          className="h-full rounded-full bg-hanada"
                           initial={{ width: 0 }}
                           animate={{ width: `${gotchi?.energy ?? 0}%` }}
                           transition={{ duration: 1, delay: 0.7 }}
                         />
                       </div>
-                      <span className="text-xs font-mono text-cyan-400">
+                      <span className="text-xs font-mono text-hanada">
                         {gotchi?.energy ?? 0}
                       </span>
                     </div>
-                  </motion.div>
+                  </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-white/5 relative z-10">
-                  <motion.a
+                <div className="mt-4 pt-3 border-t border-sumi-800">
+                  <a
                     href={`https://github.com/${user?.username ?? ''}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-slate-500 hover:text-cyan-400 transition-colors flex items-center gap-1.5"
-                    whileHover={{ x: 3 }}
+                    className="text-xs text-sumi-500 hover:text-fuji transition-colors flex items-center gap-1.5"
                   >
                     <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
                     </svg>
                     @{user?.username}
-                  </motion.a>
+                  </a>
                 </div>
-              </motion.div>
+              </div>
 
               {/* Quick Actions */}
-              <motion.div
-                className="glass-card p-5 relative overflow-hidden"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.6 }}
-                whileHover={{ scale: 1.02, y: -2 }}
-              >
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5"
-                  animate={{ opacity: [0.05, 0.1, 0.05] }}
-                  transition={{ duration: 3, repeat: Infinity, delay: 1 }}
-                />
-
-                <div className="flex items-center gap-2 mb-4 relative z-10">
-                  <motion.span
-                    className="text-xl"
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                  >
-                    ⚡
-                  </motion.span>
-                  <span className="font-display font-semibold text-sm text-white">
-                    Quick Actions
+              <div className="washi-card p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="font-display font-medium text-sm text-sumi-100">
+                    Actions
                   </span>
                 </div>
 
-                <div className="space-y-2 relative z-10">
-                  <motion.button
+                <div className="space-y-2">
+                  <button
                     id="open-inventory-btn"
-                    className="btn-purple w-full text-xs py-2.5 flex items-center justify-center gap-2"
+                    className="btn-shu w-full text-xs py-2.5 flex items-center justify-center gap-2"
                     onClick={() => setShowInventory(true)}
-                    whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(139, 92, 246, 0.5)' }}
-                    whileTap={{ scale: 0.95 }}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.7 }}
                   >
-                    🎒 Open Inventory
-                  </motion.button>
+                    Inventory
+                  </button>
 
-                  <motion.button
+                  <button
                     id="view-leaderboard-btn"
-                    className="btn-neon w-full text-xs py-2.5 flex items-center justify-center gap-2"
+                    className="btn-ink w-full text-xs py-2.5 flex items-center justify-center gap-2"
                     onClick={() => setShowLeaderboard(true)}
-                    whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(99, 102, 241, 0.5)' }}
-                    whileTap={{ scale: 0.95 }}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.8 }}
                   >
-                    🏆 Leaderboard
-                  </motion.button>
+                    Leaderboard
+                  </button>
 
-                  <motion.button
+                  <button
                     id="browse-characters-btn"
-                    className="w-full text-xs py-2.5 rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all flex items-center justify-center gap-2"
+                    className="w-full text-xs py-2.5 rounded-md border border-sumi-700 bg-sumi-800/50 text-sumi-300 hover:text-sumi-100 hover:bg-sumi-800 transition-all flex items-center justify-center gap-2"
                     onClick={() => setShowCharactersModal(true)}
-                    whileHover={{ scale: 1.05, boxShadow: '0 0 15px rgba(255, 255, 255, 0.2)' }}
-                    whileTap={{ scale: 0.95 }}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.9 }}
                   >
-                    🎭 Персонажі
-                  </motion.button>
+                    Characters
+                  </button>
 
-                  <motion.button
+                  <button
                     id="browse-guilds-btn"
-                    className="w-full text-xs py-2.5 rounded-xl border border-white/10 text-slate-400 hover:text-slate-200 hover:border-white/20 transition-all flex items-center justify-center gap-2"
+                    className="w-full text-xs py-2.5 rounded-md border border-sumi-700 text-sumi-400 hover:text-sumi-200 hover:border-sumi-600 transition-all flex items-center justify-center gap-2"
                     onClick={() => setShowGuilds(true)}
-                    whileHover={{ scale: 1.05, boxShadow: '0 0 15px rgba(255, 255, 255, 0.2)' }}
-                    whileTap={{ scale: 0.95 }}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1 }}
                   >
-                    ⚔️ Browse Guilds
-                  </motion.button>
+                    Browse Guilds
+                  </button>
 
-                  {/* Connection status debug */}
-                  <motion.div
-                    className="text-center pt-2"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1.1 }}
-                  >
-                    <motion.span
-                      className={`text-xs font-mono ${isSocketConnected ? 'text-green-500' : 'text-red-500'}`}
-                      animate={isSocketConnected ? { opacity: [0.5, 1, 0.5] } : {}}
-                      transition={{ duration: 2, repeat: Infinity }}
+                  <div className="text-center pt-2">
+                    <span
+                      className={`text-xs font-mono ${isSocketConnected ? 'text-wakatake' : 'text-shu'}`}
                     >
-                      {isSocketConnected ? '● Socket live' : '○ Socket offline'}
-                    </motion.span>
-                  </motion.div>
+                      {isSocketConnected ? 'Socket live' : 'Socket offline'}
+                    </span>
+                  </div>
                 </div>
-              </motion.div>
+              </div>
             </motion.div>
           </div>
         </main>

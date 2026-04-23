@@ -47,7 +47,7 @@ export const LANGUAGE_MODELS: Record<GotchiTheme, LanguageModelConfig> = {
     personality: 'Friendly, readable, zen-like',
   },
 
-  'JavaScript': {
+  'JS': {
     theme: 'JS',
     modelUrl: '/models/js-gotchi.vrm',
     primaryColor: '#f7df1e',
@@ -156,5 +156,5 @@ export function getModelUrl(theme: GotchiTheme): string {
 }
 
 export function getLanguageConfig(theme: GotchiTheme): LanguageModelConfig {
-  return LANGUAGE_MODELS[theme] || LANGUAGE_MODELS['JavaScript'];
+  return LANGUAGE_MODELS[theme] || LANGUAGE_MODELS['JS'];
 }

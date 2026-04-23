@@ -38,7 +38,7 @@ export const LANGUAGE_ANIMATIONS: Record<GotchiTheme, LanguageAnimationConfig> =
     headMovementRange: 0.15,
   },
 
-  'JavaScript': {
+  'JS': {
     idleSpeed: 1.3,
     typingIntensity: 1.5,
     celebrationStyle: 'energetic',
@@ -112,7 +112,7 @@ export const LANGUAGE_ANIMATIONS: Record<GotchiTheme, LanguageAnimationConfig> =
 };
 
 export function getAnimationConfig(theme: GotchiTheme): LanguageAnimationConfig {
-  return LANGUAGE_ANIMATIONS[theme] || LANGUAGE_ANIMATIONS['JavaScript'];
+  return LANGUAGE_ANIMATIONS[theme] || LANGUAGE_ANIMATIONS['JS'];
 }
 
 // ---- Apply language-specific animations to VRM ----

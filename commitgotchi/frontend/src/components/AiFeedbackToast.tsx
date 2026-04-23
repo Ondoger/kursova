@@ -13,19 +13,18 @@ export function AiFeedbackToast(): JSX.Element | null {
         {lastAiFeedback && (
           <motion.div
             className="fixed bottom-6 left-6 z-40 max-w-sm"
-            initial={{ opacity: 0, x: -30, y: 10 }}
+            initial={{ opacity: 0, x: -20, y: 8 }}
             animate={{ opacity: 1, x: 0, y: 0 }}
-            exit={{ opacity: 0, x: -30 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
           >
-            <div className="glass-card p-4 border-cyan-500/30 glow-cyan">
+            <div className="washi-card p-4 border-fuji/20">
               <div className="flex items-start gap-3">
-                <span className="text-2xl flex-shrink-0">🐱</span>
                 <div>
-                  <div className="text-xs text-cyan-400 font-semibold mb-1">
-                    Gotchi says...
+                  <div className="text-xs text-fuji font-medium mb-1 font-display">
+                    Companion says...
                   </div>
-                  <p className="text-sm text-slate-300 leading-relaxed">
+                  <p className="text-sm text-sumi-200 leading-relaxed">
                     {lastAiFeedback}
                   </p>
                 </div>
@@ -45,37 +44,37 @@ export function AiFeedbackToast(): JSX.Element | null {
             exit={{ opacity: 0 }}
           >
             <div
-              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              className="absolute inset-0 bg-sumi-950/60 backdrop-blur-sm"
               onClick={clearMorningMessage}
             />
             <motion.div
-              className="relative z-10 glass-card p-8 max-w-md w-full mx-4"
-              initial={{ scale: 0.9, y: 20 }}
+              className="relative z-10 washi-card p-8 max-w-md w-full mx-4"
+              initial={{ scale: 0.95, y: 12 }}
               animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
             >
               <div className="flex items-center gap-3 mb-4">
-                <span className="text-3xl">🌅</span>
                 <div>
-                  <h3 className="font-display font-bold text-white">
-                    Good Morning!
+                  <h3 className="font-display font-semibold text-sumi-100">
+                    Good Morning
                   </h3>
-                  <div className="text-xs text-slate-500">
-                    Morning Stand-up from Gotchi
+                  <div className="text-xs text-sumi-500">
+                    Morning message from your companion
                   </div>
                 </div>
               </div>
 
-              <p className="text-slate-300 text-sm leading-relaxed mb-6">
+              <p className="text-sumi-300 text-sm leading-relaxed mb-6">
                 {morningMessage}
               </p>
 
               <button
                 id="morning-dismiss-btn"
                 onClick={clearMorningMessage}
-                className="btn-neon w-full"
+                className="btn-ink w-full"
               >
-                Let&apos;s build! 🚀
+                Begin
               </button>
             </motion.div>
           </motion.div>

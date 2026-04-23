@@ -5,18 +5,15 @@ import type { AnimationState } from '@/types';
 
 // ─── Palette ─────────────────────────────────────────────────────────────────
 const C = {
-  // Skin — warm ivory like the reference
   skin: '#fde8d8',
   skinShade: '#f5c4a8',
   skinDeep: '#e8a888',
   skinHighlight: '#fff5f0',
-  // Hair — deep violet-purple like the reference
   hair: '#7b2fa0',
   hairMid: '#5a1f7a',
   hairDark: '#3a0f52',
   hairLight: '#a855c8',
   hairSheen: '#c084e8',
-  // Eyes — vivid blue like the reference
   eyeBlue: '#3b82f6',
   eyeBlueDeep: '#1d4ed8',
   eyeBlueLight: '#93c5fd',
@@ -24,24 +21,18 @@ const C = {
   pupil: '#0f172a',
   eyeHighlight: '#ffffff',
   eyeReflect: '#bfdbfe',
-  // Cat ears — same as hair with pink inside
   earPink: '#f9a8d4',
-  // Blush
   blush: '#fda4af',
-  // Clothes — white blouse & dark ribbon (matching reference)
   blouseBase: '#f8fafc',
   blouseShade: '#e2e8f0',
   blouseShadow: '#cbd5e1',
   ribbonDark: '#1e1b4b',
   ribbonMid: '#312e81',
-  // Skirt — dark purple
   skirtBase: '#4c1d95',
   skirtShade: '#3b0764',
   skirtHighlight: '#7c3aed',
-  // Choker & accessories
   choker: '#7c3aed',
   jewelry: '#fcd34d',
-  // Tail
   tailBase: '#7b2fa0',
   tailTip: '#d8b4fe',
 };
@@ -49,7 +40,6 @@ const C = {
 const abs: React.CSSProperties = { position: 'absolute' };
 const rel: React.CSSProperties = { position: 'relative' };
 
-// ─── Radial-gradient sphere helper ────────────────────────────────────────────
 function radial(
   w: number, h: number,
   hi: string, mid: string, dark: string,
@@ -65,7 +55,6 @@ function radial(
   };
 }
 
-// ─── Blush dot ────────────────────────────────────────────────────────────────
 function Blush({ side }: { side: 'left' | 'right' }) {
   return (
     <div style={{
@@ -81,7 +70,6 @@ function Blush({ side }: { side: 'left' | 'right' }) {
   );
 }
 
-// ─── Anime Eye ────────────────────────────────────────────────────────────────
 function AnimeEye({
   side, isAsleep, isHappy, isShocked,
 }: {
@@ -92,7 +80,6 @@ function AnimeEye({
     ? { ...abs, top: '44%', left: '14%' }
     : { ...abs, top: '44%', right: '14%' };
 
-  // ── Sleeping ──
   if (isAsleep) {
     return (
       <div style={{ ...pos, width: 30, height: 16 }}>
@@ -106,7 +93,6 @@ function AnimeEye({
     );
   }
 
-  // ── Happy ──
   if (isHappy) {
     return (
       <div style={{ ...pos, width: 30, height: 20 }}>
@@ -136,7 +122,6 @@ function AnimeEye({
       overflow: 'hidden',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
-      {/* Iris */}
       <div style={{
         ...rel,
         width: irisR * 2, height: irisR * 2,
@@ -145,41 +130,34 @@ function AnimeEye({
         marginTop: 4,
         flexShrink: 0,
       }}>
-        {/* Pupil */}
         <div style={{
           ...abs, top: '28%', left: '22%',
           width: pupilR * 1.4, height: pupilR * 1.4,
           borderRadius: '50%',
           background: C.pupil,
         }} />
-        {/* Main specular */}
         <div style={{
           ...abs, top: '8%', right: '10%',
           width: pupilR * 0.85, height: pupilR * 0.85,
           borderRadius: '50%', background: C.eyeHighlight, opacity: 0.95,
         }} />
-        {/* Secondary specular */}
         <div style={{
           ...abs, bottom: '14%', left: '10%',
           width: pupilR * 0.45, height: pupilR * 0.45,
           borderRadius: '50%', background: C.eyeHighlight, opacity: 0.7,
         }} />
-        {/* Iris ring */}
         <div style={{
           ...abs, inset: 0, borderRadius: '50%',
           boxShadow: `inset 0 0 6px ${C.eyeBlueDeep}88`,
         }} />
       </div>
-      {/* Lash arc SVG overlay */}
       <svg viewBox="0 0 28 8" width={eW} height="8"
         style={{ ...abs, top: 0, left: 0 }}>
         <path d={`M 0 7 Q 14 -1 ${eW} 7`}
           stroke={C.hair} strokeWidth="3" fill="none" strokeLinecap="round" />
-        {/* Side lashes */}
         <line x1="3" y1="6" x2="0" y2="8" stroke={C.hair} strokeWidth="1.5" strokeLinecap="round" />
         <line x1={eW - 3} y1="6" x2={eW} y2="8" stroke={C.hair} strokeWidth="1.5" strokeLinecap="round" />
       </svg>
-      {/* Bottom lash hint */}
       <svg viewBox="0 0 28 4" width={eW} height="4"
         style={{ ...abs, bottom: 0, left: 0, opacity: 0.4 }}>
         <path d={`M 4 0 Q 14 4 ${eW - 4} 0`}
@@ -189,7 +167,6 @@ function AnimeEye({
   );
 }
 
-// ─── Cat Ear ──────────────────────────────────────────────────────────────────
 function CatEar({ side }: { side: 'left' | 'right' }) {
   const isLeft = side === 'left';
   return (
@@ -197,16 +174,12 @@ function CatEar({ side }: { side: 'left' | 'right' }) {
       ...abs,
       top: -18,
       [isLeft ? 'left' : 'right']: '16%',
-      // Triangular cat ear using clip-path
       width: 30, height: 36,
       background: `linear-gradient(160deg, ${C.hairSheen} 0%, ${C.hair} 40%, ${C.hairDark} 100%)`,
-      clipPath: isLeft
-        ? 'polygon(50% 0%, 100% 100%, 0% 100%)'
-        : 'polygon(50% 0%, 100% 100%, 0% 100%)',
+      clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)',
       filter: `drop-shadow(0 -2px 6px ${C.hairDark}66)`,
       zIndex: 4,
     }}>
-      {/* Inner pink */}
       <div style={{
         ...abs,
         bottom: '10%', left: '22%',
@@ -219,11 +192,9 @@ function CatEar({ side }: { side: 'left' | 'right' }) {
   );
 }
 
-// ─── Hair ─────────────────────────────────────────────────────────────────────
 function Hair({ isAsleep }: { isAsleep: boolean }) {
   return (
     <>
-      {/* Main hair cap */}
       <div style={{
         ...abs,
         top: '-2%', left: '50%',
@@ -234,7 +205,6 @@ function Hair({ isAsleep }: { isAsleep: boolean }) {
         zIndex: 4,
         boxShadow: `0 4px 20px ${C.hairDark}aa`,
       }}>
-        {/* Bangs / fringe strands */}
         {[
           { left: '5%', w: 18, h: 32, r: -22, br: '6px 10px 14px 6px' },
           { left: '20%', w: 14, h: 38, r: -8, br: '5px 8px 12px 5px' },
@@ -257,7 +227,6 @@ function Hair({ isAsleep }: { isAsleep: boolean }) {
         ))}
       </div>
 
-      {/* Long side strands (the long flowing hair of the reference) */}
       {(['left', 'right'] as const).map(side => (
         <div key={side} style={{
           ...abs,
@@ -271,7 +240,6 @@ function Hair({ isAsleep }: { isAsleep: boolean }) {
           zIndex: 3,
           filter: `drop-shadow(${side === 'left' ? '-2px' : '2px'} 4px 8px ${C.hairDark}66)`,
         }}>
-          {/* Hair strand shine */}
           <div style={{
             ...abs,
             top: '8%', [side === 'left' ? 'right' : 'left']: '20%',
@@ -282,20 +250,17 @@ function Hair({ isAsleep }: { isAsleep: boolean }) {
         </div>
       ))}
 
-      {/* Cat ears — sit on top of hair */}
       <CatEar side="left" />
       <CatEar side="right" />
     </>
   );
 }
 
-// ─── Head ─────────────────────────────────────────────────────────────────────
 function Head({ isAsleep, isHappy, isShocked }: {
   isAsleep: boolean; isHappy: boolean; isShocked: boolean;
 }) {
   return (
     <div style={{ ...rel, width: 116, height: 130, margin: '0 auto' }}>
-      {/* Head orb */}
       <div style={{
         ...abs,
         top: '10%', left: '50%',
@@ -303,11 +268,9 @@ function Head({ isAsleep, isHappy, isShocked }: {
         ...radial(106, 114, C.skinHighlight, C.skin, C.skinShade, 38, 30),
         zIndex: 2,
       }}>
-        {/* Eyes */}
         <AnimeEye side="left" isAsleep={isAsleep} isHappy={isHappy} isShocked={isShocked} />
         <AnimeEye side="right" isAsleep={isAsleep} isHappy={isHappy} isShocked={isShocked} />
 
-        {/* Nose — tiny and delicate */}
         <div style={{
           ...abs, top: '62%', left: '50%',
           transform: 'translateX(-50%)',
@@ -317,7 +280,6 @@ function Head({ isAsleep, isHappy, isShocked }: {
           opacity: 0.45,
         }} />
 
-        {/* Mouth */}
         <div style={{ ...abs, bottom: '22%', left: '50%', transform: 'translateX(-50%)' }}>
           <svg viewBox="0 0 34 16" width="34" height="16">
             <path
@@ -343,17 +305,14 @@ function Head({ isAsleep, isHappy, isShocked }: {
           </svg>
         </div>
 
-        {/* Blush */}
         {!isShocked && <><Blush side="left" /><Blush side="right" /></>}
         {isHappy && <><Blush side="left" /><Blush side="right" /></>}
       </div>
 
-      {/* Hair on top */}
       <div style={{ ...abs, top: 0, left: 0, right: 0, zIndex: 3 }}>
         <Hair isAsleep={isAsleep} />
       </div>
 
-      {/* Sweat drop for shocked */}
       {isShocked && (
         <motion.div
           style={{
@@ -371,7 +330,6 @@ function Head({ isAsleep, isHappy, isShocked }: {
   );
 }
 
-// ─── Neck & Choker ────────────────────────────────────────────────────────────
 function Neck() {
   return (
     <div style={{
@@ -383,7 +341,6 @@ function Neck() {
       borderRadius: '2px',
       zIndex: 1,
     }}>
-      {/* Choker */}
       <div style={{
         ...abs,
         top: '35%', left: '-4px', right: '-4px',
@@ -392,7 +349,6 @@ function Neck() {
         borderRadius: '4px',
         boxShadow: `0 0 8px ${C.choker}88`,
       }}>
-        {/* Jewelry pendant */}
         <div style={{
           ...abs,
           bottom: -6, left: '50%', transform: 'translateX(-50%)',
@@ -406,7 +362,6 @@ function Neck() {
   );
 }
 
-// ─── Blouse / Top ─────────────────────────────────────────────────────────────
 function Blouse() {
   return (
     <div style={{
@@ -419,7 +374,6 @@ function Blouse() {
       boxShadow: `inset -5px -8px 16px ${C.blouseShadow}`,
       zIndex: 1,
     }}>
-      {/* Collar V-neck */}
       <div style={{
         ...abs,
         top: '8%', left: '50%', transform: 'translateX(-50%)',
@@ -428,7 +382,6 @@ function Blouse() {
         borderRight: '10px solid transparent',
         borderTop: `24px solid ${C.blouseShade}`,
       }} />
-      {/* Neck ruffle top */}
       <div style={{
         ...abs,
         top: '5%', left: '50%', transform: 'translateX(-50%)',
@@ -437,7 +390,6 @@ function Blouse() {
         background: C.blouseBase,
         borderBottom: `2px solid ${C.blouseShadow}`,
       }} />
-      {/* Ribbon / bow */}
       <div style={{
         ...abs,
         top: '28%', left: '50%', transform: 'translateX(-50%)',
@@ -445,20 +397,17 @@ function Blouse() {
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         gap: 2,
       }}>
-        {/* Left wing */}
         <div style={{
           width: 13, height: 10,
           background: `linear-gradient(135deg, ${C.ribbonMid}, ${C.ribbonDark})`,
           borderRadius: '50% 0 50% 50%',
           transform: 'rotate(-20deg)',
         }} />
-        {/* Center knot */}
         <div style={{
           width: 6, height: 8,
           borderRadius: '50%',
           background: C.ribbonDark,
         }} />
-        {/* Right wing */}
         <div style={{
           width: 13, height: 10,
           background: `linear-gradient(225deg, ${C.ribbonMid}, ${C.ribbonDark})`,
@@ -466,7 +415,6 @@ function Blouse() {
           transform: 'rotate(20deg)',
         }} />
       </div>
-      {/* Button line */}
       {[52, 65, 78].map((top, i) => (
         <div key={i} style={{
           ...abs, top: `${top}%`, left: '50%', transform: 'translateX(-50%)',
@@ -480,7 +428,6 @@ function Blouse() {
   );
 }
 
-// ─── Skirt ────────────────────────────────────────────────────────────────────
 function Skirt() {
   return (
     <div style={{
@@ -492,7 +439,6 @@ function Skirt() {
       boxShadow: `inset -4px -6px 12px ${C.skirtShade}`,
       zIndex: 0,
     }}>
-      {/* Pleats */}
       {[18, 36, 54, 72].map(x => (
         <div key={x} style={{
           ...abs, top: 0, left: x, bottom: 0, width: 1,
@@ -503,7 +449,6 @@ function Skirt() {
   );
 }
 
-// ─── Arm ──────────────────────────────────────────────────────────────────────
 function Arm({ side, pose }: { side: 'left' | 'right'; pose: 'idle' | 'up' | 'typing' }) {
   const isLeft = side === 'left';
   const rotate =
@@ -524,7 +469,6 @@ function Arm({ side, pose }: { side: 'left' | 'right'; pose: 'idle' | 'up' | 'ty
       zIndex: 0,
       transition: 'transform 0.4s ease',
     }}>
-      {/* Hand — skin coloured */}
       <div style={{
         ...abs, bottom: -12, left: '50%', transform: 'translateX(-50%)',
         ...radial(22, 22, C.skinHighlight, C.skin, C.skinShade, 35, 30),
@@ -533,7 +477,6 @@ function Arm({ side, pose }: { side: 'left' | 'right'; pose: 'idle' | 'up' | 'ty
   );
 }
 
-// ─── Leg ──────────────────────────────────────────────────────────────────────
 function Leg({ side }: { side: 'left' | 'right' }) {
   return (
     <div style={{
@@ -545,7 +488,6 @@ function Leg({ side }: { side: 'left' | 'right' }) {
       background: `linear-gradient(180deg, ${C.skirtBase} 0%, ${C.skirtShade} 100%)`,
       boxShadow: `${side === 'left' ? '-' : ''}2px 4px 8px #1e1b4b55`,
     }}>
-      {/* Foot / shoe */}
       <div style={{
         ...abs, bottom: -14, left: '50%',
         transform: `translateX(-50%) rotate(${side === 'left' ? '-5deg' : '5deg'})`,
@@ -558,7 +500,6 @@ function Leg({ side }: { side: 'left' | 'right' }) {
   );
 }
 
-// ─── Tail ─────────────────────────────────────────────────────────────────────
 function CatTail() {
   return (
     <motion.div
@@ -578,7 +519,6 @@ function CatTail() {
   );
 }
 
-// ─── Shadow ───────────────────────────────────────────────────────────────────
 function Shadow() {
   return (
     <div style={{
@@ -590,8 +530,8 @@ function Shadow() {
   );
 }
 
-// ─── Sparkles ─────────────────────────────────────────────────────────────────
-function Sparkles() {
+// Warm muted dots instead of sparkle emoji
+function WarmDots() {
   const pts = [
     { top: '2%', left: '2%' }, { top: '5%', right: '5%' },
     { top: '28%', left: '-8%' }, { top: '22%', right: '-6%' },
@@ -602,21 +542,20 @@ function Sparkles() {
         <motion.div key={i}
           style={{
             ...abs, ...p,
-            fontSize: 14 + (i % 2) * 7,
-            color: i % 2 === 0 ? '#fbbf24' : '#a78bfa',
+            width: 5 + (i % 2) * 3,
+            height: 5 + (i % 2) * 3,
+            borderRadius: '50%',
+            backgroundColor: i % 2 === 0 ? '#d4a843' : '#b4a7d6',
             userSelect: 'none', pointerEvents: 'none',
           }}
-          animate={{ scale: [0.5, 1.4, 0.5], rotate: [0, 180, 360], opacity: [0.3, 1, 0.3] }}
-          transition={{ duration: 1.3, delay: i * 0.25, repeat: Infinity }}
-        >
-          ✦
-        </motion.div>
+          animate={{ scale: [0.5, 1.2, 0.5], opacity: [0.2, 0.6, 0.2] }}
+          transition={{ duration: 2, delay: i * 0.3, repeat: Infinity }}
+        />
       ))}
     </>
   );
 }
 
-// ─── Main Export ─────────────────────────────────────────────────────────────
 export function GotchiCharacter3D({ animationState }: { animationState: AnimationState }): JSX.Element {
   const isAsleep = animationState === 'sleeping' || animationState === 'focus_lost';
   const isHappy  = animationState === 'ci_success' || animationState === 'celebrating' || animationState === 'level_up';
@@ -632,42 +571,29 @@ export function GotchiCharacter3D({ animationState }: { animationState: Animatio
       aria-label="CommitGotchi anime cat-girl"
       role="img"
     >
-      {/* 3-D tilt wrapper */}
       <div style={{
         position: 'absolute', inset: 0,
         transformStyle: 'preserve-3d',
         transform: 'rotateY(-5deg) rotateX(3deg)',
       }}>
-        {/* Head */}
         <div style={{ ...abs, top: '1%', left: '50%', transform: 'translateX(-50%)', width: 116, height: 140, zIndex: 3 }}>
           <Head isAsleep={isAsleep} isHappy={isHappy} isShocked={isShocked} />
         </div>
 
-        {/* Neck + choker */}
         <Neck />
-
-        {/* Body */}
         <Blouse />
         <Skirt />
-
-        {/* Arms */}
         <Arm side="left" pose={armPose} />
         <Arm side="right" pose={armPose} />
-
-        {/* Legs */}
         <Leg side="left" />
         <Leg side="right" />
-
-        {/* Cat tail */}
         <CatTail />
 
-        {/* Shadow */}
         <div style={{ ...abs, bottom: 0, left: 0, right: 0 }}>
           <Shadow />
         </div>
 
-        {/* Sparkles on happy */}
-        {isHappy && <Sparkles />}
+        {isHappy && <WarmDots />}
       </div>
     </div>
   );

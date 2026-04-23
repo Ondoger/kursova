@@ -2,21 +2,21 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'CommitGotchi — Gamified Developer Productivity',
+  title: 'CommitGotchi — Mindful Developer Companion',
   description:
-    'Level up your coding with CommitGotchi: a gamified SaaS where your commits power a virtual anime companion. CI tracking, Pomodoro focus sessions, and guild co-op.',
+    'A quiet space where your commits nurture a digital companion. Focus sessions, guild collaboration, and gentle AI mentorship.',
   keywords: ['developer productivity', 'gamification', 'github', 'pomodoro', 'gotchi'],
   authors: [{ name: 'CommitGotchi Team' }],
   openGraph: {
     title: 'CommitGotchi',
-    description: 'Your wholesome coding companion that grows with your commits!',
+    description: 'A mindful coding companion that grows with your commits.',
     type: 'website',
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#FFF5F7',
-  colorScheme: 'light',
+  themeColor: '#16161a',
+  colorScheme: 'dark',
 };
 
 export default function RootLayout({

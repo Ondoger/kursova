@@ -3,16 +3,11 @@
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { useEffect, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import type { AnimationState, RoomLightingState } from '@/types';
+import type { AnimationState, RoomLightingState, GotchiTheme } from '@/types';
 const GotchiModel3D = dynamic(
   () => import('./GotchiModel3D').then((mod) => mod.GotchiModel3D),
   { ssr: false }
 );
-
-// Dynamically import confetti to avoid SSR issues
-const Confetti = dynamic(() => import('react-confetti'), { ssr: false });
-
-// GotchiCharacter3D is now imported from GotchiCharacter3D.tsx
 
 // ---- Floating Zzz animation ----
 function SleepingZzz(): JSX.Element {
@@ -21,10 +16,10 @@ function SleepingZzz(): JSX.Element {
       {[0, 0.4, 0.8].map((delay, i) => (
         <motion.span
           key={i}
-          className="text-lg font-bold text-indigo-300 select-none"
+          className="text-lg font-bold text-fuji/50 select-none"
           initial={{ opacity: 0, x: 0, y: 0, scale: 0.5 }}
           animate={{
-            opacity: [0, 1, 0],
+            opacity: [0, 0.7, 0],
             x: [0, 8 + i * 4, 16 + i * 6],
             y: [0, -12 - i * 8, -28 - i * 12],
             scale: [0.5, 1, 1.2],
@@ -43,100 +38,78 @@ function SleepingZzz(): JSX.Element {
   );
 }
 
-// ---- Room background (isometric-style) ----
+// ---- Room background (zen garden) ----
 function RoomBackground({
   lighting,
 }: {
   lighting: RoomLightingState;
 }): JSX.Element {
   const tintMap: Record<RoomLightingState, string> = {
-    normal: 'rgba(34, 211, 238, 0.04)',
-    ci_success: 'rgba(251, 191, 36, 0.12)',
-    ci_failure: 'rgba(239, 68, 68, 0.12)',
-    focus_lost: 'rgba(99, 102, 241, 0.08)',
+    normal: 'rgba(180, 167, 214, 0.03)',
+    ci_success: 'rgba(107, 158, 126, 0.08)',
+    ci_failure: 'rgba(200, 90, 68, 0.08)',
+    focus_lost: 'rgba(122, 110, 92, 0.06)',
   };
 
   const tint = tintMap[lighting];
 
   return (
-    <div className="absolute inset-0 overflow-hidden rounded-2xl" aria-hidden="true">
-      {/* Floor */}
+    <div className="absolute inset-0 overflow-hidden rounded-lg" aria-hidden="true">
+      {/* Floor — tatami texture */}
       <div
         className="absolute bottom-0 left-0 right-0 h-[40%]"
         style={{
-          background: `linear-gradient(180deg, rgba(15,21,53,0.9) 0%, rgba(10,14,42,0.95) 100%)`,
+          background: `linear-gradient(180deg, rgba(36, 33, 25, 0.95) 0%, rgba(30, 27, 20, 0.98) 100%)`,
         }}
       />
 
-      {/* Grid floor pattern */}
+      {/* Tatami grid */}
       <div
-        className="absolute bottom-0 left-0 right-0 h-[35%]"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(34,211,238,0.07) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(34,211,238,0.07) 1px, transparent 1px)
-          `,
-          backgroundSize: '30px 30px',
-        }}
+        className="absolute bottom-0 left-0 right-0 h-[35%] pattern-shoji"
+        style={{ opacity: 0.4 }}
       />
 
-      {/* Wall */}
+      {/* Wall — shoji pattern */}
       <div
         className="absolute top-0 left-0 right-0 h-[65%]"
         style={{
-          background: `linear-gradient(180deg, rgba(5,7,20,0.98) 0%, rgba(15,21,53,0.9) 100%)`,
+          background: `linear-gradient(180deg, rgba(14, 14, 16, 0.98) 0%, rgba(30, 27, 23, 0.95) 100%)`,
         }}
       />
 
-      {/* Room decorations — small monitor */}
-      <div className="absolute top-6 left-8 opacity-60">
-        <div className="w-16 h-10 rounded border border-cyan-500/30 bg-navy-800 flex items-center justify-center">
-          <div className="w-12 h-7 rounded bg-cyan-900/40 flex items-center justify-center">
-            <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-          </div>
+      {/* Room decoration — kakejiku (hanging scroll) */}
+      <div className="absolute top-6 left-8 opacity-50">
+        <div className="w-12 h-20 rounded-sm border border-sumi-700 bg-sumi-900/60 flex items-center justify-center">
+          <span className="text-lg text-fuji/30 font-serif select-none">道</span>
         </div>
-        <div className="w-6 h-2 mx-auto bg-slate-700 rounded-b" />
+        <div className="w-4 h-1 mx-auto bg-sumi-700 rounded-b" />
       </div>
 
-      {/* Bookshelf */}
-      <div className="absolute top-6 right-8 flex gap-1 opacity-60">
-        {['#6366f1', '#22d3ee', '#f59e0b', '#10b981', '#ec4899'].map((color, i) => (
+      {/* Bookshelf — earthy tones */}
+      <div className="absolute top-6 right-8 flex gap-1 opacity-50">
+        {['#7a6e5c', '#6b9e7e', '#d4a843', '#b4a7d6', '#c85a44'].map((color, i) => (
           <div
             key={i}
             className="w-3 rounded-t"
-            style={{ height: `${28 + i * 4}px`, backgroundColor: color, opacity: 0.7 }}
+            style={{ height: `${28 + i * 4}px`, backgroundColor: color, opacity: 0.5 }}
           />
         ))}
       </div>
 
-      {/* Neon strip lights at top */}
-      <div
-        className="absolute top-0 left-0 right-0 h-1"
-        style={{
-          background: `linear-gradient(90deg, transparent, ${
-            lighting === 'ci_success'
-              ? 'rgba(251,191,36,0.8)'
-              : lighting === 'ci_failure'
-              ? 'rgba(239,68,68,0.8)'
-              : 'rgba(34,211,238,0.5)'
-          }, transparent)`,
-        }}
-      />
-
       {/* Dynamic room tint overlay */}
       <motion.div
-        className="absolute inset-0 rounded-2xl pointer-events-none"
+        className="absolute inset-0 rounded-lg pointer-events-none"
         animate={{ backgroundColor: tint }}
         transition={{ duration: 0.6, ease: 'easeInOut' }}
       />
 
-      {/* Window */}
-      <div className="absolute top-8 left-1/2 -translate-x-1/2 w-20 h-24 border border-cyan-500/20 bg-cyan-950/20 rounded-t-lg overflow-hidden opacity-50">
-        <div className="grid grid-cols-2 h-full divide-x divide-y divide-cyan-500/20">
-          <div className="bg-indigo-950/30" />
-          <div className="bg-sky-950/20" />
-          <div className="bg-sky-950/20" />
-          <div className="bg-indigo-950/30" />
+      {/* Window — minimal */}
+      <div className="absolute top-8 left-1/2 -translate-x-1/2 w-20 h-24 border border-sumi-700 bg-sumi-900/30 rounded-t-sm overflow-hidden opacity-40">
+        <div className="grid grid-cols-2 h-full divide-x divide-y divide-sumi-700">
+          <div className="bg-sumi-950/30" />
+          <div className="bg-sumi-900/20" />
+          <div className="bg-sumi-900/20" />
+          <div className="bg-sumi-950/30" />
         </div>
       </div>
     </div>
@@ -147,12 +120,11 @@ function RoomBackground({
 function CiFailureAlarm(): JSX.Element {
   return (
     <motion.div
-      className="absolute inset-0 rounded-2xl pointer-events-none z-10 border-2 border-red-500"
-      animate={{ opacity: [0, 0.7, 0, 0.7, 0] }}
+      className="absolute inset-0 rounded-lg pointer-events-none z-10 border border-shu/50"
+      animate={{ opacity: [0, 0.6, 0, 0.6, 0] }}
       transition={{ duration: 0.8, repeat: 3 }}
     >
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-red-600/90 text-white text-xs font-mono px-3 py-1 rounded-full flex items-center gap-2">
-        <span className="animate-pulse">⚠</span>
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-shu/80 text-sumi-50 text-xs font-mono px-3 py-1 rounded-md flex items-center gap-2">
         CI BUILD FAILED
       </div>
     </motion.div>
@@ -191,33 +163,30 @@ export function GotchiRoom({
         case 'idle':
         case 'typing':
           await controls.start({
-            y: [0, -4, 0],
-            transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+            y: [0, -3, 0],
+            transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
           });
           break;
 
         case 'ci_success':
           await controls.start({
-            y: [0, -24, -4, -18, 0],
-            rotate: [0, -5, 5, -3, 0],
-            scale: [1, 1.15, 1, 1.1, 1],
+            y: [0, -16, -2, -10, 0],
+            scale: [1, 1.08, 1, 1.04, 1],
             transition: { duration: 0.8, times: [0, 0.2, 0.5, 0.7, 1] },
           });
           break;
 
         case 'ci_failure':
           await controls.start({
-            x: [0, -8, 8, -6, 6, 0],
-            rotate: [0, -3, 3, -2, 2, 0],
+            x: [0, -6, 6, -4, 4, 0],
             transition: { duration: 0.5 },
           });
           break;
 
         case 'level_up':
           await controls.start({
-            y: [0, -30, 0, -20, 0],
-            scale: [1, 1.2, 1, 1.1, 1],
-            rotate: [0, -8, 8, -4, 0],
+            y: [0, -20, 0, -12, 0],
+            scale: [1, 1.1, 1, 1.06, 1],
             transition: { duration: 1.2 },
           });
           break;
@@ -225,8 +194,7 @@ export function GotchiRoom({
         case 'sleeping':
         case 'focus_lost':
           controls.start({
-            y: [0, 4, 0],
-            rotate: [0, 3, 0],
+            y: [0, 3, 0],
             transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
           });
           break;
@@ -245,7 +213,6 @@ export function GotchiRoom({
     }
   }, [animationState, triggerAnimation]);
 
-  // Start idle animation on mount
   useEffect(() => {
     void triggerAnimation('idle');
   }, [triggerAnimation]);
@@ -254,25 +221,46 @@ export function GotchiRoom({
   const isAsleep =
     animationState === 'sleeping' || animationState === 'focus_lost';
 
+  // Drifting ember particles instead of confetti
+  const showEmbers = showConfetti;
+
   return (
     <div
-      className="relative w-full h-full rounded-2xl overflow-hidden"
+      className="relative w-full h-full rounded-lg overflow-hidden"
       data-room-state={lighting}
       aria-label={`${gotchiName}'s room`}
       role="region"
     >
-      {/* Room background */}
       <RoomBackground lighting={lighting} />
 
-      {/* Confetti on CI success / level up */}
-      {showConfetti && (
-        <Confetti
-          width={400}
-          height={400}
-          recycle={false}
-          numberOfPieces={120}
-          colors={['#22d3ee', '#8b5cf6', '#fbbf24', '#34d399', '#f9a8d4']}
-        />
+      {/* Drifting embers on success/level up */}
+      {showEmbers && (
+        <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute rounded-full"
+              style={{
+                width: 3 + Math.random() * 3,
+                height: 3 + Math.random() * 3,
+                left: `${10 + Math.random() * 80}%`,
+                bottom: '-5%',
+                backgroundColor: i % 2 === 0 ? '#d4a843' : '#b4a7d6',
+                opacity: 0.5,
+              }}
+              animate={{
+                y: [0, -(300 + Math.random() * 200)],
+                x: [0, (Math.random() - 0.5) * 80],
+                opacity: [0.5, 0],
+              }}
+              transition={{
+                duration: 3 + Math.random() * 2,
+                delay: Math.random() * 1.5,
+                ease: 'easeOut',
+              }}
+            />
+          ))}
+        </div>
       )}
 
       {/* CI failure alarm */}
@@ -280,7 +268,7 @@ export function GotchiRoom({
         {lighting === 'ci_failure' && <CiFailureAlarm />}
       </AnimatePresence>
 
-      {/* Gotchi character — 3D anime */}
+      {/* Gotchi character */}
       <div className="absolute inset-0 w-full h-full z-10 pointer-events-auto">
         <motion.div
           animate={controls}
@@ -289,14 +277,13 @@ export function GotchiRoom({
         >
           <GotchiModel3D animationState={animationState} mood={mood} modelUrl={modelUrl} theme={theme} />
 
-          {/* Zzz overlay */}
           <AnimatePresence>
             {isAsleep && <SleepingZzz />}
           </AnimatePresence>
         </motion.div>
       </div>
 
-      {/* Typing animation — keyboard glow */}
+      {/* Typing indicator */}
       <AnimatePresence>
         {isTyping && (
           <motion.div
@@ -305,36 +292,36 @@ export function GotchiRoom({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            {[0, 0.1, 0.2].map((delay) => (
+            {[0, 0.15, 0.3].map((delay) => (
               <motion.div
                 key={delay}
-                className="w-1.5 h-1.5 rounded-full bg-cyan-400"
-                animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
-                transition={{ duration: 0.8, delay, repeat: Infinity }}
+                className="w-1.5 h-1.5 rounded-full bg-fuji/50"
+                animate={{ opacity: [0.3, 0.8, 0.3] }}
+                transition={{ duration: 1.2, delay, repeat: Infinity }}
               />
             ))}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Stat HUD — bottom corners */}
+      {/* Stat HUD — text-based mood/energy */}
       <div className="absolute bottom-3 left-3 flex flex-col gap-1 z-20">
         <div className="stat-pill">
-          <span>💜</span>
-          <span className="font-mono text-purple-300">{mood}</span>
+          <span className="text-xs text-sumi-400">mood</span>
+          <span className="font-mono text-fuji">{mood}</span>
         </div>
       </div>
 
       <div className="absolute bottom-3 right-3 flex flex-col gap-1 z-20">
         <div className="stat-pill">
-          <span>⚡</span>
-          <span className="font-mono text-cyan-300">{energy}</span>
+          <span className="text-xs text-sumi-400">energy</span>
+          <span className="font-mono text-hanada">{energy}</span>
         </div>
       </div>
 
       {/* Name plate */}
       <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20">
-        <div className="px-4 py-1 rounded-full glass-card text-xs font-semibold text-cyan-300 border-cyan-500/30">
+        <div className="px-4 py-1 rounded-md washi-card text-xs font-medium text-sumi-200 border-sumi-700">
           {gotchiName}
         </div>
       </div>
@@ -344,19 +331,19 @@ export function GotchiRoom({
         {animationState !== 'idle' && (
           <motion.div
             className="absolute top-10 left-1/2 -translate-x-1/2 z-20"
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            exit={{ opacity: 0, y: -8 }}
           >
             <div
-              className={`px-3 py-1 rounded-full text-xs font-mono font-semibold border ${
+              className={`px-3 py-1 rounded-md text-xs font-mono font-medium border ${
                 animationState === 'ci_success' || animationState === 'level_up'
-                  ? 'text-amber-300 border-amber-500/40 bg-amber-500/10'
+                  ? 'text-wakatake border-wakatake/30 bg-wakatake/10'
                   : animationState === 'ci_failure'
-                  ? 'text-red-300 border-red-500/40 bg-red-500/10'
+                  ? 'text-shu border-shu/30 bg-shu/10'
                   : animationState === 'sleeping' || animationState === 'focus_lost'
-                  ? 'text-indigo-300 border-indigo-500/40 bg-indigo-500/10'
-                  : 'text-cyan-300 border-cyan-500/40 bg-cyan-500/10'
+                  ? 'text-sumi-400 border-sumi-600 bg-sumi-800/50'
+                  : 'text-fuji border-fuji/30 bg-fuji/10'
               }`}
             >
               {animationState.replace('_', ' ').toUpperCase()}

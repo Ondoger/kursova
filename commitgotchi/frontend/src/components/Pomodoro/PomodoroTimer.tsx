@@ -35,7 +35,6 @@ export function PomodoroTimer(): JSX.Element {
   const tabHiddenAtRef = useRef<number | null>(null);
   const socket = getSocket();
 
-  // ---- Page Visibility API — detect focus loss ----
   useEffect(() => {
     if (!pomodoroActive) return;
 
@@ -47,7 +46,6 @@ export function PomodoroTimer(): JSX.Element {
         tabHiddenAtRef.current = null;
 
         if (tabHiddenMs > 2000) {
-          // Only emit if away for more than 2 seconds
           socket.emit('focus_lost', { tabHiddenMs });
           handleFocusLostStore(Math.min(15, Math.floor(tabHiddenMs / 60000) + 5));
         }
@@ -69,22 +67,14 @@ export function PomodoroTimer(): JSX.Element {
     clearPomodoro();
   }, [socket, clearPomodoro]);
 
-  // Progress circle offset
   const strokeDashoffset = CIRCUMFERENCE - (pomodoroPercent / 100) * CIRCUMFERENCE;
-  const progressColor =
-    pomodoroPercent >= 80
-      ? '#4ade80'
-      : pomodoroPercent >= 50
-      ? '#22d3ee'
-      : '#a78bfa';
 
   return (
-    <div className="glass-card p-5 flex flex-col gap-4">
+    <div className="washi-card p-5 flex flex-col gap-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xl">🍅</span>
-          <span className="font-display font-semibold text-sm text-white">
+          <span className="font-display font-medium text-sm text-sumi-100">
             Focus Timer
           </span>
         </div>
@@ -95,43 +85,37 @@ export function PomodoroTimer(): JSX.Element {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              className="flex items-center gap-1.5 text-xs text-green-400 font-mono"
+              className="flex items-center gap-1.5 text-xs text-wakatake font-mono"
             >
-              <motion.div
-                className="w-2 h-2 rounded-full bg-green-400"
-                animate={{ opacity: [1, 0.3, 1] }}
-                transition={{ duration: 1, repeat: Infinity }}
-              />
+              <div className="w-1.5 h-1.5 rounded-full bg-wakatake animate-breathe" />
               ACTIVE
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Timer circle */}
+      {/* Enso timer circle */}
       <div className="flex flex-col items-center gap-4">
         <div className="relative w-36 h-36">
-          {/* Background circle */}
           <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120" aria-hidden="true">
             <circle
               cx="60"
               cy="60"
               r={RADIUS}
               fill="none"
-              stroke="rgba(255,255,255,0.05)"
-              strokeWidth="8"
+              stroke="rgba(180, 167, 214, 0.08)"
+              strokeWidth="4"
             />
             <motion.circle
               cx="60"
               cy="60"
               r={RADIUS}
               fill="none"
-              stroke={progressColor}
-              strokeWidth="8"
+              stroke="#b4a7d6"
+              strokeWidth="4"
               strokeLinecap="round"
               strokeDasharray={CIRCUMFERENCE}
               strokeDashoffset={strokeDashoffset}
-              style={{ filter: `drop-shadow(0 0 6px ${progressColor})` }}
               animate={{ strokeDashoffset }}
               transition={{ duration: 1, ease: 'linear' }}
             />
@@ -139,12 +123,12 @@ export function PomodoroTimer(): JSX.Element {
 
           {/* Time display */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="font-mono text-2xl font-bold text-white">
+            <span className="font-mono text-2xl font-medium text-sumi-100">
               {pomodoroActive
                 ? formatTime(pomodoroRemaining)
                 : `${String(selectedDuration).padStart(2, '0')}:00`}
             </span>
-            <span className="text-xs text-slate-500 mt-0.5">
+            <span className="text-xs text-sumi-500 mt-0.5">
               {pomodoroActive ? 'remaining' : 'focus'}
             </span>
           </div>
@@ -158,10 +142,10 @@ export function PomodoroTimer(): JSX.Element {
                 key={value}
                 id={`pomodoro-${value}min`}
                 onClick={() => setSelectedDuration(value)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                   selectedDuration === value
-                    ? 'bg-purple-600/30 border border-purple-500/50 text-purple-300'
-                    : 'bg-white/5 border border-white/10 text-slate-500 hover:text-slate-300'
+                    ? 'bg-fuji/15 border border-fuji/30 text-fuji'
+                    : 'bg-sumi-800/50 border border-sumi-700 text-sumi-500 hover:text-sumi-300'
                 }`}
               >
                 {label}
@@ -177,26 +161,26 @@ export function PomodoroTimer(): JSX.Element {
           <button
             id="pomodoro-start-btn"
             onClick={handleStart}
-            className="btn-neon flex-1 text-sm py-2.5"
+            className="btn-ink flex-1 text-sm py-2.5"
           >
-            🍅 Start Focus
+            Start Focus
           </button>
         ) : (
           <button
             id="pomodoro-stop-btn"
             onClick={handleStop}
-            className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold border border-red-500/40 text-red-400 bg-red-500/10 hover:bg-red-500/20 transition-all"
+            className="flex-1 px-4 py-2.5 rounded-md text-sm font-medium border border-shu/30 text-shu bg-shu/10 hover:bg-shu/20 transition-all"
           >
-            ⏹ Stop
+            Stop
           </button>
         )}
       </div>
 
       {/* Focus tip */}
-      <p className="text-xs text-slate-600 text-center leading-relaxed">
+      <p className="text-xs text-sumi-600 text-center leading-relaxed">
         {pomodoroActive
-          ? '👀 Stay on this tab! Your Gotchi is watching.'
-          : 'Switch tabs during focus = Gotchi loses energy ⚡'}
+          ? 'Stay on this tab. Your companion is watching.'
+          : 'Switching tabs during focus drains energy.'}
       </p>
     </div>
   );

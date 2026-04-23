@@ -18,17 +18,17 @@ function formatTime(iso: string): string {
   });
 }
 
-const ACTION_TYPE_ICONS: Record<string, string> = {
-  COMMIT: '🔀',
-  BUILD_SUCCESS: '✅',
-  BUILD_FAILED: '❌',
-  POMODORO_COMPLETED: '🍅',
-  FOCUS_LOST: '😴',
-  DAILY_LOGIN: '👋',
-  GUILD_JOINED: '⚔️',
-  PR_MERGED: '🔗',
-  PR_OPENED: '📬',
-  default: '📌',
+const ACTION_TYPE_LABELS: Record<string, string> = {
+  COMMIT: 'Commit',
+  BUILD_SUCCESS: 'Build OK',
+  BUILD_FAILED: 'Build Failed',
+  POMODORO_COMPLETED: 'Focus Done',
+  FOCUS_LOST: 'Focus Lost',
+  DAILY_LOGIN: 'Login',
+  GUILD_JOINED: 'Joined',
+  PR_MERGED: 'PR Merged',
+  PR_OPENED: 'PR Opened',
+  default: 'Activity',
 };
 
 export function GuildChat({ guildId, guildName }: GuildChatProps): JSX.Element {
@@ -38,12 +38,10 @@ export function GuildChat({ guildId, guildName }: GuildChatProps): JSX.Element {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socket = getSocket();
 
-  // Auto-scroll to latest message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [guildMessages, activeTab]);
 
-  // Join guild room on mount
   useEffect(() => {
     if (socket.connected) {
       socket.emit('join_guild', { guildId });
@@ -52,8 +50,8 @@ export function GuildChat({ guildId, guildName }: GuildChatProps): JSX.Element {
     socket.on('guild_member_joined', (payload: { username: string }) => {
       const systemMsg: GuildMessagePayload = {
         userId: 'system',
-        username: '🤖 System',
-        message: `${payload.username} joined the guild!`,
+        username: 'System',
+        message: `${payload.username} joined the guild.`,
         timestamp: new Date().toISOString(),
       };
       addGuildMessage(systemMsg);
@@ -80,19 +78,19 @@ export function GuildChat({ guildId, guildName }: GuildChatProps): JSX.Element {
   };
 
   return (
-    <div className="glass-card flex flex-col h-full overflow-hidden">
+    <div className="washi-card flex flex-col h-full overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-sumi-800">
         <div className="flex items-center gap-2">
-          <span className="text-lg">⚔️</span>
+          <span className="text-lg text-fuji/40 font-serif select-none">結</span>
           <div>
-            <div className="text-sm font-semibold text-white">{guildName}</div>
-            <div className="text-xs text-slate-500">Guild Chat</div>
+            <div className="text-sm font-medium text-sumi-100">{guildName}</div>
+            <div className="text-xs text-sumi-500">Guild</div>
           </div>
         </div>
 
         {/* Tab switcher */}
-        <div className="flex rounded-lg overflow-hidden border border-white/10 text-xs">
+        <div className="flex rounded-md overflow-hidden border border-sumi-700 text-xs">
           {(['chat', 'feed'] as const).map((tab) => (
             <button
               key={tab}
@@ -100,11 +98,11 @@ export function GuildChat({ guildId, guildName }: GuildChatProps): JSX.Element {
               onClick={() => setActiveTab(tab)}
               className={`px-3 py-1.5 font-medium transition-colors ${
                 activeTab === tab
-                  ? 'bg-cyan-500/20 text-cyan-400'
-                  : 'text-slate-500 hover:text-slate-300'
+                  ? 'bg-fuji/15 text-fuji'
+                  : 'text-sumi-500 hover:text-sumi-300'
               }`}
             >
-              {tab === 'chat' ? '💬 Chat' : '📋 Feed'}
+              {tab === 'chat' ? 'Chat' : 'Feed'}
             </button>
           ))}
         </div>
@@ -122,9 +120,8 @@ export function GuildChat({ guildId, guildName }: GuildChatProps): JSX.Element {
               className="space-y-2"
             >
               {guildMessages.length === 0 && (
-                <div className="text-center text-slate-600 text-sm py-8">
-                  <div className="text-2xl mb-2">💬</div>
-                  Be the first to say hello!
+                <div className="text-center text-sumi-600 text-sm py-8">
+                  Be the first to say hello.
                 </div>
               )}
 
@@ -135,39 +132,38 @@ export function GuildChat({ guildId, guildName }: GuildChatProps): JSX.Element {
                 return (
                   <motion.div
                     key={`${msg.timestamp}-${idx}`}
-                    initial={{ opacity: 0, y: 8 }}
+                    initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     className={`flex gap-2 ${isOwn ? 'flex-row-reverse' : 'flex-row'} ${isSystem ? 'justify-center' : ''}`}
                   >
                     {isSystem ? (
-                      <div className="text-xs text-slate-600 font-mono">
+                      <div className="text-xs text-sumi-600 font-mono">
                         {msg.message}
                       </div>
                     ) : (
                       <>
-                        {/* Avatar */}
                         {!isOwn && (
-                          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex-shrink-0 flex items-center justify-center text-white text-xs font-bold">
+                          <div className="w-7 h-7 rounded-full bg-sumi-700 flex-shrink-0 flex items-center justify-center text-sumi-300 text-xs font-medium">
                             {msg.username[0]?.toUpperCase()}
                           </div>
                         )}
 
                         <div className={`max-w-[80%] ${isOwn ? 'items-end' : 'items-start'} flex flex-col`}>
                           {!isOwn && (
-                            <span className="text-xs text-slate-500 mb-0.5 ml-1">
+                            <span className="text-xs text-sumi-500 mb-0.5 ml-1">
                               {msg.username}
                             </span>
                           )}
                           <div
-                            className={`px-3 py-2 rounded-2xl text-sm leading-relaxed ${
+                            className={`px-3 py-2 rounded-lg text-sm leading-relaxed ${
                               isOwn
-                                ? 'bg-cyan-600/20 border border-cyan-500/30 text-cyan-100 rounded-tr-sm'
-                                : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-sm'
+                                ? 'bg-fuji/10 border border-fuji/20 text-sumi-100 rounded-tr-sm'
+                                : 'bg-sumi-800/60 border border-sumi-700 text-sumi-200 rounded-tl-sm'
                             }`}
                           >
                             {msg.message}
                           </div>
-                          <span className="text-xs text-slate-700 mt-0.5 mx-1">
+                          <span className="text-xs text-sumi-700 mt-0.5 mx-1">
                             {formatTime(msg.timestamp)}
                           </span>
                         </div>
@@ -188,32 +184,28 @@ export function GuildChat({ guildId, guildName }: GuildChatProps): JSX.Element {
               className="space-y-2"
             >
               {activityFeed.length === 0 && (
-                <div className="text-center text-slate-600 text-sm py-8">
-                  <div className="text-2xl mb-2">📋</div>
-                  No activity yet. Make a commit!
+                <div className="text-center text-sumi-600 text-sm py-8">
+                  No activity yet. Make a commit.
                 </div>
               )}
 
               {activityFeed.map((entry) => (
                 <motion.div
                   key={entry.id}
-                  initial={{ opacity: 0, x: -10 }}
+                  initial={{ opacity: 0, x: -8 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="flex items-start gap-3 p-2.5 rounded-xl bg-white/3 border border-white/5 hover:bg-white/5 transition-colors"
+                  className="flex items-start gap-3 p-2.5 rounded-md bg-sumi-800/30 border border-sumi-800 hover:bg-sumi-800/50 transition-colors"
                 >
-                  <span className="text-lg flex-shrink-0">
-                    {ACTION_TYPE_ICONS[entry.actionType] ?? ACTION_TYPE_ICONS.default}
-                  </span>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs font-medium text-slate-300">
-                      {entry.actionType.replace(/_/g, ' ')}
+                    <div className="text-xs font-medium text-sumi-300">
+                      {ACTION_TYPE_LABELS[entry.actionType] ?? ACTION_TYPE_LABELS.default}
                     </div>
                     {entry.xpGained > 0 && (
-                      <div className="text-xs text-cyan-400 font-mono">
+                      <div className="text-xs text-fuji font-mono">
                         +{entry.xpGained} XP
                       </div>
                     )}
-                    <div className="text-xs text-slate-600 font-mono mt-0.5">
+                    <div className="text-xs text-sumi-600 font-mono mt-0.5">
                       {formatTime(entry.createdAt)}
                     </div>
                   </div>
@@ -224,9 +216,9 @@ export function GuildChat({ guildId, guildName }: GuildChatProps): JSX.Element {
         </AnimatePresence>
       </div>
 
-      {/* Message input — only in chat tab */}
+      {/* Message input */}
       {activeTab === 'chat' && (
-        <div className="p-3 border-t border-white/5">
+        <div className="p-3 border-t border-sumi-800">
           <div className="flex gap-2">
             <input
               id="guild-message-input"
@@ -236,17 +228,17 @@ export function GuildChat({ guildId, guildName }: GuildChatProps): JSX.Element {
               onKeyDown={handleKeyDown}
               placeholder="Say something..."
               maxLength={500}
-              className="neon-input flex-1 text-sm"
+              className="zen-input flex-1 text-sm"
               aria-label="Guild chat message"
             />
             <button
               id="guild-send-btn"
               onClick={sendMessage}
               disabled={!message.trim()}
-              className="btn-neon px-4 py-2 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="btn-ink px-4 py-2 disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Send message"
             >
-              ↑
+              &uarr;
             </button>
           </div>
         </div>
