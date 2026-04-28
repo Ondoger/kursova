@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Exec(node)",
+      "Exec(npm create)",
+      "Exec(npm install)",
+      "Exec(npx tailwindcss)",
+      "Exec(ls src)",
+      "Exec(rm)",
+      "Exec(npm run)",
+      "Exec(curl)",
+      "Exec(find)",
+      "Exec(python)",
+      "Exec(mkdir)",
+      "Exec(git status)",
+      "Exec(npx tsc)",
+      "Exec(npx vite)",
+      "Exec(ls)",
+      "Exec(cmd.exe)",
+      "Exec(powershell.exe)"
+    ]
+  }
+}
